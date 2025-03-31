@@ -255,4 +255,56 @@ export class DeviceStatus {
     public protocol: string;
     public busNumber: number;
     public address: number|string;
+
+
+  
+  private convertDFRobotPH(value: number, device?: any): number {
+    const voltage = value;
+
+    const neutralVoltage = device?.options?.neutralVoltage ?? 2.5;
+    const acidVoltage = device?.options?.acidVoltage ?? 2.0;
+
+    // Reproduce DFRobot's slope/intercept calculation logic
+    const slope = (7.0 - 4.0) / ((neutralVoltage - 1.5)/3.0 - (acidVoltage - 1.5)/3.0);
+    const intercept = 7.0 - slope * (neutralVoltage - 1.5)/3.0;
+
+    return slope * (voltage - 1.5)/3.0 + intercept;
+  }
+
+
+  private convertDFRobotORP(value: number): number {
+    // ORP sensors often output millivolts directly (adjust as needed)
+    // Assuming value is in volts; convert to mV
+    return value * 1000;
+  }
+
+
+  public async deviceCommand(device: any, command: string): Promise<any> {
+    if (!device.options) device.options = {};
+
+    const channelIndex = device.channel ?? 0;
+    const voltage = this.getLastVoltageFromDevice(device, channelIndex);
+
+    switch (command) {
+      case "setNeutral":
+        device.options.neutralVoltage = voltage;
+        return { message: `Neutral voltage set to ${voltage.toFixed(3)} V` };
+
+      case "setAcid":
+        device.options.acidVoltage = voltage;
+        return { message: `Acid voltage set to ${voltage.toFixed(3)} V` };
+
+      default:
+        throw new Error(`Unknown command: ${command}`);
+    }
+  }
+
+  private getLastVoltageFromDevice(device: any, channel: number): number {
+    const values = device?.lastValues;
+    if (!values || !values.channels || !values.channels[channel]) {
+      throw new Error("Voltage data not available for this channel.");
+    }
+    return values.channels[channel].voltage ?? 0;
+  }
+
 }

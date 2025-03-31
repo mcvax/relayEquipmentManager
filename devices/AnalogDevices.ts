@@ -255,4 +255,27 @@ export class DeviceStatus {
     public protocol: string;
     public busNumber: number;
     public address: number|string;
+
+
+  
+  private convertDFRobotPH(value: number, device?: any): number {
+    const voltage = value;
+
+    const neutralVoltage = device?.options?.neutralVoltage ?? 2.5;
+    const acidVoltage = device?.options?.acidVoltage ?? 2.0;
+
+    // Reproduce DFRobot's slope/intercept calculation logic
+    const slope = (7.0 - 4.0) / ((neutralVoltage - 1.5)/3.0 - (acidVoltage - 1.5)/3.0);
+    const intercept = 7.0 - slope * (neutralVoltage - 1.5)/3.0;
+
+    return slope * (voltage - 1.5)/3.0 + intercept;
+  }
+
+
+  private convertDFRobotORP(value: number): number {
+    // ORP sensors often output millivolts directly (adjust as needed)
+    // Assuming value is in volts; convert to mV
+    return value * 1000;
+  }
+
 }

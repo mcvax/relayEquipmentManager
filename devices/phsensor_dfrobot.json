@@ -29,7 +29,92 @@
           "maxSamples": 50
         }
       ],
-      "options": [],
+      "options": [
+        {
+          "dataType": "panel",
+          "field": {
+            "type": "fieldset",
+            "legend": "Calibration",
+            "style": {
+              "marginTop": "1rem"
+            }
+          },
+          "options": [
+            {
+              "field": {
+                "type": "numberField",
+                "binding": "options.neutralVoltage",
+                "labelText": "Neutral Voltage (pH 7)",
+                "units": "V",
+                "inputAttrs": {
+                  "step": "0.01",
+                  "min": "0",
+                  "max": "5"
+                }
+              }
+            },
+            {
+              "field": {
+                "type": "numberField",
+                "binding": "options.acidVoltage",
+                "labelText": "Acid Voltage (pH 4)",
+                "units": "V",
+                "inputAttrs": {
+                  "step": "0.01",
+                  "min": "0",
+                  "max": "5"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "dataType": "panel",
+          "field": {
+            "type": "fieldset",
+            "legend": "Interactive Calibration",
+            "style": {
+              "marginTop": "1rem"
+            }
+          },
+          "options": [
+            {
+              "field": {
+                "type": "actionButton",
+                "text": "Set Neutral Voltage (pH 7)",
+                "icon": "<i class=\"fas fa-tint\"></i>",
+                "style": {
+                  "width": "16rem"
+                }
+              },
+              "fieldEvents": {
+                "click": {
+                  "type": "putservice",
+                  "path": "`/config/i2c/${device.busNumber}/${device.address}/deviceCommand/setNeutral`",
+                  "message": "Capturing neutral voltage..."
+                }
+              }
+            },
+            {
+              "field": {
+                "type": "actionButton",
+                "text": "Set Acid Voltage (pH 4)",
+                "icon": "<i class=\"fas fa-flask\"></i>",
+                "style": {
+                  "width": "16rem"
+                }
+              },
+              "fieldEvents": {
+                "click": {
+                  "type": "putservice",
+                  "path": "`/config/i2c/${device.busNumber}/${device.address}/deviceCommand/setAcid`",
+                  "message": "Capturing acid voltage..."
+                }
+              }
+            }
+          ]
+        }
+      ],
       "interfaces": [
         "i2c"
       ]

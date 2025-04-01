@@ -272,11 +272,12 @@ export class DeviceStatus {
   }
 
 
-  private convertDFRobotORP(value: number): number {
-    // ORP sensors often output millivolts directly (adjust as needed)
-    // Assuming value is in volts; convert to mV
-    return value * 1000;
+  
+  private convertDFRobotORP(value: number, device?: any): number {
+    const offset = device?.options?.orpOffset ?? 0;
+    return value * 1000 + offset;
   }
+
 
 
   public async deviceCommand(device: any, command: string): Promise<any> {
